@@ -1,31 +1,45 @@
-mod lexer;
-mod symbol_table;
 mod error_handler;
+mod lexer;
+mod parser;
+mod symbol_table;
 
-use error_handler::error_handler::ErrorHandler;
-use error_handler::error_type::ErrorType;
-use symbol_table::symbol_table::SymbolTable;
-use symbol_table::symbol_type::SymbolType;
 use lexer::lexer::Lexer;
+use parser::parser::Parser;
 
 fn main() {
-    let mut error_handler = ErrorHandler::new();
+     // Código de exemplo da linguagem QuestLang, sem semicolons após comandos simples.
+     let source_code = r#"
+     move_up
+     attack
+     if (hero) { move_left } else { move_right }
+     while (enemy) { jump }
+     for (hero; enemy; treasure) { defend }
+ "#;
 
-    // Adicionando erros de diferentes tipos
-    error_handler.add_error(ErrorType::Lexical, "Token inválido encontrado", 2, 10);
-    error_handler.add_error(ErrorType::Syntactic, "Esperado ';' após a instrução", 4, 5);
-    error_handler.add_error(ErrorType::Semantic, "Variável não declarada", 6, 15);
+ // Executa o Lexer para obter os tokens
+ let mut lexer = Lexer::new(source_code);
+ let tokens = lexer.tokenize();
 
-    // Adicionando warnings
-    error_handler.add_warning("Uso de variável não inicializada", 8, 3);
-
-    // Exibir os erros acumulados
-    error_handler.report();
-
-    // Limpar os erros
-    error_handler.clear();
-
-    // Teste após limpar
-    println!("Após limpar:");
-    error_handler.report();
+ println!("--- Tokens ---");
+ for (token, text) in &tokens {
+     println!("{:?} -> '{}'", token, text);
+ }
+ 
+ // Executa o Parser com os tokens obtidos
+ let mut parser = Parser::new(tokens);
+ let ast = parser.parse();
+ 
+ println!("\n--- AST ---");
+ for stmt in &ast {
+     println!("{:#?}", stmt);
+ }
+ 
+ // Reporta erros, se houver
+ let errors = parser.into_errors();
+ if errors.has_errors() {
+     println!("\n--- Erros ---");
+     errors.report();
+ } else {
+     println!("\nSem erros sintáticos.");
+ }
 }
