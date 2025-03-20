@@ -2,8 +2,10 @@ mod lexer;
 mod symbol_table;
 mod error_handler;
 
-use error_handler::error_handler::{ErrorHandler, ErrorType};
-use symbol_table::symbol_table::{SymbolType, SymbolTable};
+use error_handler::error_handler::ErrorHandler;
+use error_handler::error_type::ErrorType;
+use symbol_table::symbol_table::SymbolTable;
+use symbol_table::symbol_type::SymbolType;
 use lexer::lexer::Lexer;
 
 fn main() {

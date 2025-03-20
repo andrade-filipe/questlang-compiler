@@ -1,4 +1,6 @@
-use questlang::error_handler::error_handler::{ErrorHandler, ErrorType, CompilerError};
+use questlang::error_handler::error_type::ErrorType;
+use questlang::error_handler::compiler_error::CompilerError;
+use questlang::error_handler::error_handler::ErrorHandler;
 
 #[test]
 fn test_add_error() {

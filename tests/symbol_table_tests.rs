@@ -1,4 +1,5 @@
-use questlang::symbol_table::symbol_table::{SymbolType, SymbolTable};
+use questlang::symbol_table::symbol_table::SymbolTable;
+use questlang::symbol_table::symbol_type::SymbolType;
 
 #[test]
 fn test_insertion_and_lookup() {
