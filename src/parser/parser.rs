@@ -1,8 +1,7 @@
 use crate::{
     parser::ast::{Stmt, Command, MoveCommand, ActionCommand, Expr, BinOp},
     parser::ast_builder::ASTBuilder,
-    error_handler::error_handler::ErrorHandler,
-    error_handler::error_type::ErrorType,
+    error_handler::{error_handler::ErrorHandler, error_type::ErrorType},
     lexer::token::Token,
 };
 
@@ -114,27 +113,20 @@ impl<'a> Parser<'a> {
         self.builder.push_for(init, condition, update, body);
     }
 
+    /// Altera o parse_block para extrair somente as statements adicionadas durante o bloco,
+    /// preservando as statements do nível top-level.
     fn parse_block(&mut self) -> Vec<Stmt> {
-        let mut block = Vec::new();
+        // Registra o índice atual no builder.
+        let start_index = self.builder.statements.len();
         if self.consume(Token::LBrace, "Expected '{' to start block").is_none() {
-            return block;
+            return Vec::new();
         }
         while !self.check(Token::RBrace) && !self.is_at_end() {
-            let pos_before = self.pos;
             self.parse_stmt();
-            if self.pos == pos_before {
-                self.advance(); // Evita loop infinito
-            }
         }
         self.consume(Token::RBrace, "Expected '}' to close block");
-        // Método simplificado para extrair as statements do bloco.
-        self.extract_last_block()
-    }
-
-    /// Método simplificado para extrair o bloco atual.
-    /// Em uma implementação robusta, utilizaríamos uma pilha de blocos.
-    fn extract_last_block(&mut self) -> Vec<Stmt> {
-        std::mem::take(&mut self.builder.statements)
+        // Extrai apenas as statements adicionadas neste bloco.
+        self.builder.statements.split_off(start_index)
     }
 
     fn parse_expr(&mut self) -> Option<Expr> {
