@@ -1,0 +1,11 @@
+[package]
+name = "questlang-compiler"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+logos = "0.15.0"
+
+[lib]
+name = "questlang"
+path = "src/lib.rs"
