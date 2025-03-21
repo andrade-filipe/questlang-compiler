@@ -1,4 +1,4 @@
-use crate::parser::ast::{Stmt, Command, MoveCommand, ActionCommand, Expr, BinOp};
+use crate::parser::ast::{Stmt, Command, Expr, BinOp};
 
 #[derive(Default)]
 pub struct ASTBuilder;
