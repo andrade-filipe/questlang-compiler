@@ -8,7 +8,8 @@ fn lex(input: &str) -> Vec<Token> {
 
 #[test]
 fn test_keywords() {
-    let tokens = lex("move_up move_down attack if else while for");
+    let input = "move_up move_down attack if else while for";
+    let tokens = lex(input);
     assert_eq!(
         tokens,
         vec![
@@ -19,13 +20,16 @@ fn test_keywords() {
             Token::Else,
             Token::While,
             Token::For,
-        ]
+        ],
+        "Falha ao tokenizar palavras-chave: {}",
+        input
     );
 }
 
 #[test]
 fn test_operators() {
-    let tokens = lex("+ - * / && || !");
+    let input = "+ - * / && || !";
+    let tokens = lex(input);
     assert_eq!(
         tokens,
         vec![
@@ -36,13 +40,16 @@ fn test_operators() {
             Token::LogicalAnd,
             Token::LogicalOr,
             Token::LogicalNot,
-        ]
+        ],
+        "Falha ao tokenizar operadores: {}",
+        input
     );
 }
 
 #[test]
 fn test_identifiers_numbers() {
-    let tokens = lex("hero enemy 123 456");
+    let input = "hero enemy 123 456";
+    let tokens = lex(input);
     assert_eq!(
         tokens,
         vec![
@@ -50,13 +57,17 @@ fn test_identifiers_numbers() {
             Token::Identifier,
             Token::Number,
             Token::Number,
-        ]
+        ],
+        "Falha ao tokenizar identificadores e números: {}",
+        input
     );
 }
 
 #[test]
-fn test_symbols_and_syntax() {
-    let tokens = lex("( ) { } ;");
+fn test_symbols() {
+    // Testa os símbolos: parênteses e chaves.
+    let input = "( ) { }";
+    let tokens = lex(input);
     assert_eq!(
         tokens,
         vec![
@@ -64,14 +75,16 @@ fn test_symbols_and_syntax() {
             Token::RParen,
             Token::LBrace,
             Token::RBrace,
-            Token::Semicolon,
-        ]
+        ],
+        "Falha ao tokenizar símbolos: {}",
+        input
     );
 }
 
 #[test]
 fn test_invalid_tokens() {
-    let tokens = lex("@ $ % ^");
+    let input = "@ $ % ^";
+    let tokens = lex(input);
     assert_eq!(
         tokens,
         vec![
@@ -79,112 +92,118 @@ fn test_invalid_tokens() {
             Token::Error,
             Token::Error,
             Token::Error,
-        ]
+        ],
+        "Tokens inválidos não foram marcados corretamente: {}",
+        input
     );
 }
 
-/// ✅ Testa um código realista com várias instruções combinadas
 #[test]
 fn test_mixed_tokens() {
-    let tokens = lex("move_up; attack; if (hero) { move_left; } else { move_right; }");
+    // Testa um código realista com várias instruções, sem semicolons.
+    let input = "move_up attack if (hero) { move_left } else { move_right }";
+    let tokens = lex(input);
+    let expected = vec![
+        Token::MoveUp,
+        Token::Attack,
+        Token::If,
+        Token::LParen,
+        Token::Identifier,
+        Token::RParen,
+        Token::LBrace,
+        Token::MoveLeft,
+        Token::RBrace,
+        Token::Else,
+        Token::LBrace,
+        Token::MoveRight,
+        Token::RBrace,
+    ];
     assert_eq!(
-        tokens,
-        vec![
-            Token::MoveUp,
-            Token::Semicolon,
-            Token::Attack,
-            Token::Semicolon,
-            Token::If,
-            Token::LParen,
-            Token::Identifier,
-            Token::RParen,
-            Token::LBrace,
-            Token::MoveLeft,
-            Token::Semicolon,
-            Token::RBrace,
-            Token::Else,
-            Token::LBrace,
-            Token::MoveRight,
-            Token::Semicolon,
-            Token::RBrace,
-        ]
+        tokens, expected,
+        "Falha ao tokenizar código misto: {}",
+        input
     );
 }
 
-/// ✅ Testa espaços em branco e quebras de linha
 #[test]
 fn test_whitespace_and_newlines() {
-    let tokens = lex("
-        move_up   
-        move_down
-
-        attack
-    ");
+    let input = "\n  move_up  \n move_down \n\n attack \n";
+    let tokens = lex(input);
+    // Supondo que o lexer emita Token::Newline onde houver '\n'
+    let expected = vec![
+        Token::Newline,
+        Token::MoveUp,
+        Token::Newline,
+        Token::MoveDown,
+        Token::Newline,
+        Token::Newline,
+        Token::Attack,
+        Token::Newline,
+    ];
     assert_eq!(
-        tokens,
-        vec![
-            Token::MoveUp,
-            Token::MoveDown,
-            Token::Attack,
-        ]
+        tokens, expected,
+        "Falha ao tokenizar espaços e quebras de linha: {}",
+        input
     );
 }
 
-/// ✅ Testa se o Lexer ignora corretamente comentários (`//`)
 #[test]
 fn test_comments() {
-    let tokens = lex("
-        move_up; // Isso é um comentário
-        attack;  // Outro comentário
-    ");
+    let input = "\n move_up // este é um comentário\n attack // outro comentário\n";
+    let tokens = lex(input);
+    // Comentários devem ser ignorados, mas quebras de linha devem ser mantidas.
+    let expected = vec![
+        Token::Newline,
+        Token::MoveUp,
+        Token::Newline,
+        Token::Attack,
+        Token::Newline,
+    ];
     assert_eq!(
-        tokens,
-        vec![
-            Token::MoveUp,
-            Token::Semicolon,
-            Token::Attack,
-            Token::Semicolon,
-        ]
+        tokens, expected,
+        "Falha ao ignorar comentários: {}",
+        input
     );
 }
 
-/// ✅ Testa expressões matemáticas mais complexas
 #[test]
 fn test_complex_expressions() {
-    let tokens = lex("hero + 10 * enemy / (5 - 2);");
+    let input = "hero + 10 * enemy / (5 - 2)";
+    let tokens = lex(input);
+    let expected = vec![
+        Token::Identifier,
+        Token::Plus,
+        Token::Number,
+        Token::Mul,
+        Token::Identifier,
+        Token::Div,
+        Token::LParen,
+        Token::Number,
+        Token::Minus,
+        Token::Number,
+        Token::RParen,
+    ];
     assert_eq!(
-        tokens,
-        vec![
-            Token::Identifier,
-            Token::Plus,
-            Token::Number,
-            Token::Mul,
-            Token::Identifier,
-            Token::Div,
-            Token::LParen,
-            Token::Number,
-            Token::Minus,
-            Token::Number,
-            Token::RParen,
-            Token::Semicolon,
-        ]
+        tokens, expected,
+        "Falha ao tokenizar expressões complexas: {}",
+        input
     );
 }
 
-/// ✅ Testa código misturado com tokens inválidos
 #[test]
 fn test_mixed_with_invalid_tokens() {
-    let tokens = lex("move_up @ attack # 123abc");
+    let input = "move_up @ attack # 123abc";
+    let tokens = lex(input);
+    let expected = vec![
+        Token::MoveUp,
+        Token::Error, // '@'
+        Token::Attack,
+        Token::Error, // '#'
+        Token::Error, // '123abc' inválido
+    ];
     assert_eq!(
-        tokens,
-        vec![
-            Token::MoveUp,
-            Token::Error, // '@' inválido
-            Token::Attack,
-            Token::Error, // '#' inválido
-            Token::Error, // '123abc' inválido (número seguido de letras)
-        ]
+        tokens, expected,
+        "Falha ao tokenizar código misto com tokens inválidos: {}",
+        input
     );
 }
-
-

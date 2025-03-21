@@ -1,0 +1,12 @@
+move_up
+if (hero { move_left } else { move_right }
+while enemy) { jump
+for (hero; enemy treasure) { defend }
+if (trap) {
+    move_up
+    while (hero + 1 { attack }
+} else {
+    move_right
+    if (hero - 2) attack else { jump }
+}
+hero + 10 - 

@@ -1,0 +1,6 @@
+ if (hero) {
+    if (enemy) { move_left } else { move_right }
+    while (treasure) { jump }
+    } else {
+        for (hero; enemy; trap) { defend }
+        }

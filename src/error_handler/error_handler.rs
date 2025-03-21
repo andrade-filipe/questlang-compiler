@@ -1,6 +1,7 @@
 use crate::error_handler::error_type::ErrorType;
 use crate::error_handler::compiler_error::CompilerError;
 
+#[derive(Default)]
 pub struct ErrorHandler {
     errors: Vec<CompilerError>,
     warnings: Vec<CompilerError>,

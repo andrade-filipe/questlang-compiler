@@ -1,119 +1,84 @@
 use crate::parser::ast::{Stmt, Command, MoveCommand, ActionCommand, Expr, BinOp};
 
 pub struct PrettyPrinter {
-    output: String,
+    lines: Vec<String>,
 }
 
 impl PrettyPrinter {
     pub fn new() -> Self {
-        PrettyPrinter {
-            output: String::new(),
-        }
+        PrettyPrinter { lines: Vec::new() }
     }
 
     pub fn print_stmts(&mut self, stmts: &[Stmt]) -> String {
         for stmt in stmts {
             self.print_stmt(stmt, 0);
         }
-        self.output.clone()
+        let mut output = self.lines.join("\n");
+        if !output.is_empty() {
+            output.push('\n');
+        }
+        output
     }
 
-    fn print_stmt(&mut self, stmt: &Stmt, indent: usize) {
-        let indent_str = "  ".repeat(indent);
+    fn print_stmt(&mut self, stmt: &Stmt, level: usize) {
+        let indent = if level > 0 { "  ".repeat(level) } else { String::new() };
         match stmt {
             Stmt::Command(cmd) => {
-                self.output.push_str(&indent_str);
-                self.output.push_str("Command: ");
-                self.print_command(cmd);
-                self.output.push('\n');
-            },
+                self.lines.push(format!("{}Command: {}", indent, self.format_command(cmd)));
+            }
             Stmt::IfStmt { condition, then_branch, else_branch } => {
-                self.output.push_str(&indent_str);
-                self.output.push_str("if (");
-                self.print_expr(condition);
-                self.output.push_str(") {\n");
-                for s in then_branch {
-                    self.print_stmt(s, indent + 1);
-                }
-                self.output.push_str(&indent_str);
-                self.output.push_str("} else {\n");
-                for s in else_branch {
-                    self.print_stmt(s, indent + 1);
-                }
-                self.output.push_str(&indent_str);
-                self.output.push_str("}\n");
-            },
+                self.lines.push(format!("{}if ({}) {{", indent, self.format_expr(condition)));
+                for s in then_branch { self.print_stmt(s, level + 1); }
+                self.lines.push(format!("{}}} else {{", indent));
+                for s in else_branch { self.print_stmt(s, level + 1); }
+                self.lines.push(format!("{}}}", indent));
+            }
             Stmt::WhileStmt { condition, body } => {
-                self.output.push_str(&indent_str);
-                self.output.push_str("while (");
-                self.print_expr(condition);
-                self.output.push_str(") {\n");
-                for s in body {
-                    self.print_stmt(s, indent + 1);
-                }
-                self.output.push_str(&indent_str);
-                self.output.push_str("}\n");
-            },
+                self.lines.push(format!("{}while ({}) {{", indent, self.format_expr(condition)));
+                for s in body { self.print_stmt(s, level + 1); }
+                self.lines.push(format!("{}}}", indent));
+            }
             Stmt::ForStmt { init, condition, update, body } => {
-                self.output.push_str(&indent_str);
-                self.output.push_str("for ("); // Inicial maiúscula conforme teste
-                self.print_expr(init);
-                self.output.push_str("; ");
-                self.print_expr(condition);
-                self.output.push_str("; ");
-                self.print_expr(update);
-                self.output.push_str(") {\n");
-                for s in body {
-                    self.print_stmt(s, indent + 1);
-                }
-                self.output.push_str(&indent_str);
-                self.output.push_str("}\n");
-            },
+                self.lines.push(format!("{}for ({}; {}; {}) {{", indent, 
+                    self.format_expr(init), 
+                    self.format_expr(condition), 
+                    self.format_expr(update)
+                ));
+                for s in body { self.print_stmt(s, level + 1); }
+                self.lines.push(format!("{}}}", indent));
+            }
             Stmt::ExprStmt(expr) => {
-                self.output.push_str(&indent_str);
-                self.output.push_str("Expr: ");
-                self.print_expr(expr);
-                self.output.push('\n');
+                self.lines.push(format!("{}Expr: {}", indent, self.format_expr(expr)));
             }
         }
     }
 
-    fn print_command(&mut self, cmd: &Command) {
+    fn format_command(&self, cmd: &Command) -> String {
         match cmd {
-            Command::Move(m) => {
-                let s = match m {
-                    MoveCommand::MoveUp => "move_up",
-                    MoveCommand::MoveDown => "move_down",
-                    MoveCommand::MoveLeft => "move_left",
-                    MoveCommand::MoveRight => "move_right",
-                };
-                self.output.push_str(s);
+            Command::Move(m) => match m {
+                MoveCommand::MoveUp => "move_up".into(),
+                MoveCommand::MoveDown => "move_down".into(),
+                MoveCommand::MoveLeft => "move_left".into(),
+                MoveCommand::MoveRight => "move_right".into(),
             },
-            Command::Action(a) => {
-                let s = match a {
-                    ActionCommand::Jump => "jump",
-                    ActionCommand::Attack => "attack",
-                    ActionCommand::Defend => "defend",
-                };
-                self.output.push_str(s);
+            Command::Action(a) => match a {
+                ActionCommand::Jump => "jump".into(),
+                ActionCommand::Attack => "attack".into(),
+                ActionCommand::Defend => "defend".into(),
             },
         }
     }
 
-    fn print_expr(&mut self, expr: &Expr) {
+    fn format_expr(&self, expr: &Expr) -> String {
         match expr {
-            Expr::Identifier(s) => self.output.push_str(s),
-            Expr::Number(n) => self.output.push_str(&n.to_string()),
+            Expr::Identifier(s) => s.clone(),
+            Expr::Number(n) => n.to_string(),
             Expr::BinaryOp { left, op, right } => {
-                self.output.push('(');
-                self.print_expr(left);
                 let op_str = match op {
                     BinOp::Add => " + ",
                     BinOp::Sub => " - ",
                 };
-                self.output.push_str(op_str);
-                self.print_expr(right);
-                self.output.push(')');
+                format!("({}{}{})", self.format_expr(left), op_str, self.format_expr(right))
             }
         }
     }

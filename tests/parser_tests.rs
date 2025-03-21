@@ -130,7 +130,6 @@ fn test_for_statement() {
 
 #[test]
 fn test_multiple_statements() {
-    // Testa uma sequência de statements
     let source = r#"
         move_up
         if (hero) { move_left } else { move_right }

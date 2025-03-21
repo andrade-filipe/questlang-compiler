@@ -22,116 +22,118 @@ impl<'a> Parser<'a> {
         }
     }
 
-    /// Percorre todos os tokens e constrói a AST, retornando a AST e o ErrorHandler.
+    /// Processa todos os tokens e retorna a AST e o ErrorHandler.
     pub fn parse(mut self) -> (Vec<Stmt>, ErrorHandler) {
+        let mut statements = Vec::new();
         while !self.is_at_end() {
-            self.parse_stmt();
+            self.skip_newlines();  // ignora tokens de nova linha
+            if self.is_at_end() {
+                break;
+            }
+            if let Some(stmt) = self.parse_stmt() {
+                statements.push(stmt);
+            } else {
+                self.advance();
+            }
         }
-        let ast = self.builder.build();
-        (ast, self.errors)
+        (statements, std::mem::take(&mut self.errors))
+    }
+    
+    fn skip_newlines(&mut self) {
+        while self.check(Token::Newline) {
+            self.advance();
+        }
     }
 
-    fn parse_stmt(&mut self) {
+    fn parse_stmt(&mut self) -> Option<Stmt> {
         match self.peek() {
             Token::MoveUp | Token::MoveDown | Token::MoveLeft | Token::MoveRight
             | Token::Jump | Token::Attack | Token::Defend => {
-                self.parse_command();
+                self.parse_command()
             }
             Token::If => self.parse_if(),
             Token::While => self.parse_while(),
             Token::For => self.parse_for(),
-            // Se não for nenhum desses, tenta parsear uma expressão como statement
             _ => {
                 if let Some(expr) = self.parse_expr() {
-                    self.builder.push_expr(expr);
+                    Some(self.builder.new_expr_stmt(expr))
                 } else {
                     self.error("Expected statement");
                     self.advance();
+                    None
                 }
             }
         }
     }
 
-    fn parse_command(&mut self) {
+    fn parse_command(&mut self) -> Option<Stmt> {
         let token = self.advance().0;
-        let command = match token {
-            Token::MoveUp => Command::Move(MoveCommand::MoveUp),
-            Token::MoveDown => Command::Move(MoveCommand::MoveDown),
-            Token::MoveLeft => Command::Move(MoveCommand::MoveLeft),
-            Token::MoveRight => Command::Move(MoveCommand::MoveRight),
-            Token::Jump => Command::Action(ActionCommand::Jump),
-            Token::Attack => Command::Action(ActionCommand::Attack),
-            Token::Defend => Command::Action(ActionCommand::Defend),
+        let stmt = match token {
+            Token::MoveUp => self.builder.new_command(Command::Move(MoveCommand::MoveUp)),
+            Token::MoveDown => self.builder.new_command(Command::Move(MoveCommand::MoveDown)),
+            Token::MoveLeft => self.builder.new_command(Command::Move(MoveCommand::MoveLeft)),
+            Token::MoveRight => self.builder.new_command(Command::Move(MoveCommand::MoveRight)),
+            Token::Jump => self.builder.new_command(Command::Action(ActionCommand::Jump)),
+            Token::Attack => self.builder.new_command(Command::Action(ActionCommand::Attack)),
+            Token::Defend => self.builder.new_command(Command::Action(ActionCommand::Defend)),
             _ => {
                 self.error("Invalid command");
-                return;
+                return None;
             }
         };
-        self.builder.push_command(command);
+        Some(stmt)
     }
 
-    fn parse_if(&mut self) {
-        self.consume(Token::If, "Expected 'if'").unwrap_or(());
-        self.consume(Token::LParen, "Expected '(' after if").unwrap_or(());
-        let condition = match self.parse_expr() {
-            Some(expr) => expr,
-            None => return,
-        };
-        self.consume(Token::RParen, "Expected ')' after if condition").unwrap_or(());
+    fn parse_if(&mut self) -> Option<Stmt> {
+        self.consume(Token::If, "Expected 'if'")?;
+        self.consume(Token::LParen, "Expected '(' after if")?;
+        let condition = self.parse_expr()?;
+        self.consume(Token::RParen, "Expected ')' after if condition")?;
         let then_branch = self.parse_block();
-        self.consume(Token::Else, "Expected 'else' after if block").unwrap_or(());
+        self.consume(Token::Else, "Expected 'else' after if block")?;
         let else_branch = self.parse_block();
-        self.builder.push_if(condition, then_branch, else_branch);
+        Some(self.builder.new_if(condition, then_branch, else_branch))
     }
 
-    fn parse_while(&mut self) {
-        self.consume(Token::While, "Expected 'while'").unwrap_or(());
-        self.consume(Token::LParen, "Expected '(' after while").unwrap_or(());
-        let condition = match self.parse_expr() {
-            Some(expr) => expr,
-            None => return,
-        };
-        self.consume(Token::RParen, "Expected ')' after while condition").unwrap_or(());
+    fn parse_while(&mut self) -> Option<Stmt> {
+        self.consume(Token::While, "Expected 'while'")?;
+        self.consume(Token::LParen, "Expected '(' after while")?;
+        let condition = self.parse_expr()?;
+        self.consume(Token::RParen, "Expected ')' after while condition")?;
         let body = self.parse_block();
-        self.builder.push_while(condition, body);
+        Some(self.builder.new_while(condition, body))
     }
 
-    fn parse_for(&mut self) {
-        self.consume(Token::For, "Expected 'for'").unwrap_or(());
-        self.consume(Token::LParen, "Expected '(' after for").unwrap_or(());
-        let init = match self.parse_expr() {
-            Some(expr) => expr,
-            None => return,
-        };
-        self.consume(Token::Semicolon, "Expected ';' after initialization").unwrap_or(());
-        let condition = match self.parse_expr() {
-            Some(expr) => expr,
-            None => return,
-        };
-        self.consume(Token::Semicolon, "Expected ';' after condition").unwrap_or(());
-        let update = match self.parse_expr() {
-            Some(expr) => expr,
-            None => return,
-        };
-        self.consume(Token::RParen, "Expected ')' after for clauses").unwrap_or(());
+    fn parse_for(&mut self) -> Option<Stmt> {
+        self.consume(Token::For, "Expected 'for'")?;
+        self.consume(Token::LParen, "Expected '(' after for")?;
+        let init = self.parse_expr()?;
+        self.consume(Token::Semicolon, "Expected ';' after initialization")?;
+        let condition = self.parse_expr()?;
+        self.consume(Token::Semicolon, "Expected ';' after condition")?;
+        let update = self.parse_expr()?;
+        self.consume(Token::RParen, "Expected ')' after for clauses")?;
         let body = self.parse_block();
-        self.builder.push_for(init, condition, update, body);
+        Some(self.builder.new_for(init, condition, update, body))
     }
 
-    /// Altera o parse_block para extrair somente as statements adicionadas durante o bloco,
-    /// preservando as statements do nível top-level.
+    /// Lê um bloco delimitado por '{' e '}', retornando apenas os statements do bloco.
     fn parse_block(&mut self) -> Vec<Stmt> {
-        // Registra o índice atual no builder
-        let start_index = self.builder.statements.len();
+        let mut statements = Vec::new();
         if self.consume(Token::LBrace, "Expected '{' to start block").is_none() {
-            return Vec::new();
+            return statements;
         }
         while !self.check(Token::RBrace) && !self.is_at_end() {
-            self.parse_stmt();
+            self.skip_newlines();
+            if self.check(Token::RBrace) { break; }
+            if let Some(stmt) = self.parse_stmt() {
+                statements.push(stmt);
+            } else {
+                self.advance();
+            }
         }
         self.consume(Token::RBrace, "Expected '}' to close block");
-        // Extrai somente as statements adicionadas neste bloco
-        self.builder.statements.split_off(start_index)
+        statements
     }
 
     fn parse_expr(&mut self) -> Option<Expr> {
@@ -143,20 +145,20 @@ impl<'a> Parser<'a> {
                 _ => unreachable!(),
             };
             let right = self.parse_primary()?;
-            expr = self.builder.make_binop(expr, op, right);
+            expr = self.builder.new_binop(expr, op, right);
         }
         Some(expr)
     }
 
     fn parse_primary(&mut self) -> Option<Expr> {
         match self.advance() {
-            (Token::Identifier, text) => Some(self.builder.make_identifier(text)),
+            (Token::Identifier, text) => Some(self.builder.new_identifier(text)),
             (Token::Number, text) => {
                 let value: i32 = text.parse().unwrap_or_else(|_| {
                     self.error("Invalid number literal");
                     0
                 });
-                Some(self.builder.make_number(value))
+                Some(self.builder.new_number(value))
             },
             (tok, text) => {
                 self.error(&format!("Unexpected token '{:?}' in expression (found '{}')", tok, text));
@@ -164,8 +166,6 @@ impl<'a> Parser<'a> {
             }
         }
     }
-
-    // Métodos utilitários
 
     fn peek(&self) -> Token {
         self.tokens.get(self.pos).map(|(t, _)| t.clone()).unwrap_or_default()

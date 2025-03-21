@@ -26,12 +26,12 @@ fn test_pretty_print() {
     let output = printer.print_stmts(&ast);
     let expected = "\
 Command: move_up
-If (hero) {
+if (hero) {
   Command: move_left
 } else {
   Command: move_right
 }
-While (enemy) {
+while (enemy) {
   Command: jump
 }
 ";

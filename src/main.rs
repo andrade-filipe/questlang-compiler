@@ -15,15 +15,13 @@ use symbol_table::symbol_table::SymbolTable;
 use symbol_table::symbol_type::SymbolType;
 
 fn main() {
-     // Captura os argumentos da linha de comando
      let args: Vec<String> = env::args().collect();
      if args.len() < 2 {
          eprintln!("Uso: {} <arquivo_fonte>", args[0]);
          process::exit(1);
      }
      let filename = &args[1];
- 
-     // Lê o arquivo de código fonte
+
      let source_code = fs::read_to_string(filename).unwrap_or_else(|err| {
          eprintln!("Erro ao ler o arquivo {}: {}", filename, err);
          process::exit(1);
