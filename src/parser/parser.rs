@@ -24,11 +24,10 @@ impl<'a> Parser<'a> {
         }
     }
 
-    /// Processa todos os tokens e retorna a AST e o ErrorHandler.
     pub fn parse(mut self) -> (Vec<Stmt>, ErrorHandler) {
         let mut statements = Vec::new();
         while !self.is_at_end() {
-            self.skip_newlines();  // ignora tokens de nova linha
+            self.skip_newlines();
             if self.is_at_end() {
                 break;
             }
@@ -119,7 +118,6 @@ impl<'a> Parser<'a> {
         Some(self.builder.new_for(init, condition, update, body))
     }
 
-    /// Lê um bloco delimitado por '{' e '}', retornando apenas os statements do bloco.
     fn parse_block(&mut self) -> Vec<Stmt> {
         let mut statements = Vec::new();
         if self.consume(Token::LBrace, "Expected '{' to start block").is_none() {

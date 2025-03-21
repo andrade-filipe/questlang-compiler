@@ -65,6 +65,8 @@ pub enum Token {
     #[regex(r"[0-9]+", priority = 1)]
     Number,
     
+    #[token("\n")]
+    Newline,
 
     // Comentários (ignorar)
     #[regex(r"//[^\n]*", logos::skip)]
@@ -73,9 +75,6 @@ pub enum Token {
     // Espaços em branco (ignorar)
     #[regex(r"[ \t\f\r]+", logos::skip)]
     Whitespace,
-
-    #[token("\n")]
-    Newline,
 
     #[default] // Token inválido (usando Default)
     #[regex(r"[0-9]+[a-zA-Z][a-zA-Z0-9_]*", priority = 3)] // variaveis que começam com numeros, exemplo: 123abc

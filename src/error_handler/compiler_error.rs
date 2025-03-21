@@ -20,7 +20,6 @@ impl CompilerError {
     }
 }
 
-/// Implementação para exibir os erros formatados
 impl fmt::Display for CompilerError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
