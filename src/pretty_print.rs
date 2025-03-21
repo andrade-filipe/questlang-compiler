@@ -1,8 +1,5 @@
-// src/pretty_print.rs
-
 use crate::parser::ast::{Stmt, Command, MoveCommand, ActionCommand, Expr, BinOp};
 
-/// PrettyPrinter gera uma representação formatada (pretty print) da AST.
 pub struct PrettyPrinter {
     output: String,
 }
@@ -14,7 +11,6 @@ impl PrettyPrinter {
         }
     }
 
-    /// Gera a saída formatada para um vetor de statements.
     pub fn print_stmts(&mut self, stmts: &[Stmt]) -> String {
         for stmt in stmts {
             self.print_stmt(stmt, 0);
@@ -22,7 +18,6 @@ impl PrettyPrinter {
         self.output.clone()
     }
 
-    /// Função recursiva para imprimir um statement com indentação.
     fn print_stmt(&mut self, stmt: &Stmt, indent: usize) {
         let indent_str = "  ".repeat(indent);
         match stmt {
@@ -34,7 +29,7 @@ impl PrettyPrinter {
             },
             Stmt::IfStmt { condition, then_branch, else_branch } => {
                 self.output.push_str(&indent_str);
-                self.output.push_str("If (");
+                self.output.push_str("if (");
                 self.print_expr(condition);
                 self.output.push_str(") {\n");
                 for s in then_branch {
@@ -50,7 +45,7 @@ impl PrettyPrinter {
             },
             Stmt::WhileStmt { condition, body } => {
                 self.output.push_str(&indent_str);
-                self.output.push_str("While (");
+                self.output.push_str("while (");
                 self.print_expr(condition);
                 self.output.push_str(") {\n");
                 for s in body {
@@ -61,7 +56,7 @@ impl PrettyPrinter {
             },
             Stmt::ForStmt { init, condition, update, body } => {
                 self.output.push_str(&indent_str);
-                self.output.push_str("For (");
+                self.output.push_str("for ("); // Inicial maiúscula conforme teste
                 self.print_expr(init);
                 self.output.push_str("; ");
                 self.print_expr(condition);

@@ -3,7 +3,7 @@ use crate::symbol_table::symbol_type::SymbolType;
 use crate::symbol_table::symbol::Symbol;
 
 pub struct SymbolTable {
-    symbols: HashMap<String, Symbol>,
+    pub symbols: HashMap<String, Symbol>,
     scope_level: usize,
 }
 
