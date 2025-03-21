@@ -6,16 +6,18 @@ use crate::{
 };
 
 pub struct Parser<'a> {
-    tokens: Vec<(Token, &'a str)>,
+    tokens: Vec<(Token, &'a str, usize)>,
+    source: &'a str,
     pos: usize,
     errors: ErrorHandler,
     builder: ASTBuilder,
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(tokens: Vec<(Token, &'a str)>) -> Self {
+    pub fn new(tokens: Vec<(Token, &'a str, usize)>, source: &'a str) -> Self {
         Parser {
             tokens,
+            source,
             pos: 0,
             errors: ErrorHandler::new(),
             builder: ASTBuilder::new(),
@@ -152,15 +154,15 @@ impl<'a> Parser<'a> {
 
     fn parse_primary(&mut self) -> Option<Expr> {
         match self.advance() {
-            (Token::Identifier, text) => Some(self.builder.new_identifier(text)),
-            (Token::Number, text) => {
+            (Token::Identifier, text, _) => Some(self.builder.new_identifier(text)),
+            (Token::Number, text, _) => {
                 let value: i32 = text.parse().unwrap_or_else(|_| {
                     self.error("Invalid number literal");
                     0
                 });
                 Some(self.builder.new_number(value))
             },
-            (tok, text) => {
+            (tok, text, _) => {
                 self.error(&format!("Unexpected token '{:?}' in expression (found '{}')", tok, text));
                 None
             }
@@ -168,11 +170,11 @@ impl<'a> Parser<'a> {
     }
 
     fn peek(&self) -> Token {
-        self.tokens.get(self.pos).map(|(t, _)| t.clone()).unwrap_or_default()
+        self.tokens.get(self.pos).map(|(t, _, _)| t.clone()).unwrap_or_default()
     }
 
-    fn advance(&mut self) -> (Token, &'a str) {
-        let current = self.tokens.get(self.pos).cloned().unwrap_or((Token::Error, ""));
+    fn advance(&mut self) -> (Token, &'a str, usize) {
+        let current = self.tokens.get(self.pos).cloned().unwrap_or((Token::Error, "", 0));
         self.pos += 1;
         current
     }
@@ -196,7 +198,23 @@ impl<'a> Parser<'a> {
     }
 
     fn error(&mut self, msg: &str) {
-        let (token, text) = self.tokens.get(self.pos).cloned().unwrap_or((Token::Error, ""));
-        self.errors.add_error(ErrorType::Syntactic, &format!("{} (found '{}')", msg, text), 0, 0);
+        let (_token, text, offset) = self
+            .tokens
+            .get(self.pos)
+            .cloned()
+            .unwrap_or((Token::Error, "", 0));
+        let (line, col) = offset_to_line_col(self.source, offset);
+        self.errors
+            .add_error(ErrorType::Syntactic, &format!("{} (found '{}')", msg, text), line, col);
     }
+}
+
+fn offset_to_line_col(src: &str, offset: usize) -> (usize, usize) {
+    let mut line = 1;
+    let mut col = 1;
+    for (i, ch) in src.char_indices() {
+        if i == offset { break; }
+        if ch == '\n' { line += 1; col = 1; } else { col += 1; }
+    }
+    (line, col)
 }

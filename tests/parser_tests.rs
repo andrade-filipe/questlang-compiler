@@ -1,4 +1,4 @@
-use questlang::parser::ast::{Stmt, Command, MoveCommand, ActionCommand, Expr, BinOp};
+use questlang::parser::ast::{Stmt, Command, MoveCommand, ActionCommand, Expr};
 use questlang::error_handler::error_handler::ErrorHandler;
 use questlang::lexer::lexer::Lexer;
 use questlang::parser::parser::Parser;
@@ -7,7 +7,7 @@ use questlang::parser::parser::Parser;
 fn parse_source(source: &str) -> (Vec<Stmt>, ErrorHandler) {
     let mut lexer = Lexer::new(source);
     let tokens = lexer.tokenize();
-    let (ast, errors) = Parser::new(tokens).parse();
+    let (ast, errors) = Parser::new(tokens, source).parse();
     (ast, errors)
 }
 

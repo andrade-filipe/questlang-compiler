@@ -9,7 +9,7 @@ fn run_full_compilation(source: &str) -> (Vec<questlang::parser::ast::Stmt>, que
     let mut lexer = Lexer::new(source);
     let tokens = lexer.tokenize();
 
-    let (ast, errors) = Parser::new(tokens).parse();
+    let (ast, errors) = Parser::new(tokens, source).parse();
 
     let mut printer = PrettyPrinter::new();
     let pretty_output = printer.print_stmts(&ast);
@@ -130,7 +130,7 @@ fn test_nested_control_structures() {
             for (hero; enemy; trap) { defend }
         }
     "#;
-    let (ast, errors, pretty_output, _sym_table) = run_full_compilation(source);
+    let (_ast, errors, pretty_output, _sym_table) = run_full_compilation(source);
     assert!(!errors.has_errors(), "Não devem ocorrer erros sintáticos em estruturas aninhadas");
  
     assert!(pretty_output.contains("if ("), "A saída deve conter 'if ('");

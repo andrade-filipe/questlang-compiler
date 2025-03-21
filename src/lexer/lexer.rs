@@ -12,14 +12,16 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn tokenize(&mut self) -> Vec<(Token, &str)> {
-        let lexer_clone = self.lexer.clone();
-        lexer_clone
+    pub fn tokenize(&mut self) -> Vec<(Token, &str, usize)> {
+        let source = self.lexer.source();
+        self.lexer
+            .clone()
             .spanned()
-            .map(|(token_result, span)| {
-                let token = token_result.unwrap_or(Token::Error); // Garante que tokens inválidos sejam tratados corretamente
-                (token, &self.lexer.source()[span])
+            .map(|(res, span)| {
+                let token = res.unwrap_or(Token::Error);
+                let slice = &source[span.clone()];
+                (token, slice, span.start)
             })
             .collect()
-    }    
+    } 
 }

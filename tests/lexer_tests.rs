@@ -3,7 +3,7 @@ use questlang::lexer::token::Token;
 
 fn lex(input: &str) -> Vec<Token> {
     let mut lexer = Lexer::new(input);
-    lexer.tokenize().into_iter().map(|(token, _)| token).collect()
+    lexer.tokenize().into_iter().map(|(token, _, _)| token).collect()
 }
 
 #[test]

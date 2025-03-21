@@ -31,12 +31,13 @@ fn main() {
      let mut lexer = Lexer::new(&source_code);
      let tokens = lexer.tokenize();
      println!("--- Tokens ---");
-     for (token, text) in tokens.iter() {
+     for (token, text, _) in tokens.iter() {
          println!("{:?} -> '{}'", token, text);
      }
  
      // --- Parsing ---
-     let (ast, errors) = Parser::new(tokens).parse();
+     let (ast, errors) = Parser::new(tokens, &source_code).parse();
+
      if errors.has_errors() {
          println!("\n--- Parsing Errors ---");
          errors.report();
