@@ -74,6 +74,12 @@ impl PrettyPrinter {
                 self.output.push_str(&indent_str);
                 self.output.push_str("}\n");
             },
+            Stmt::ExprStmt(expr) => {
+                self.output.push_str(&indent_str);
+                self.output.push_str("Expr: ");
+                self.print_expr(expr);
+                self.output.push('\n');
+            }
         }
     }
 

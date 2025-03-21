@@ -41,6 +41,7 @@ pub enum Stmt {
         update: Expr,
         body: Vec<Stmt>,
     },
+    ExprStmt(Expr),
 }
 
 #[derive(Debug, Clone, PartialEq)]

@@ -16,8 +16,10 @@ impl ASTBuilder {
             statements: Vec::new(),
         }
     }
-
-    // Métodos para construir nós da AST
+    
+    pub fn push_expr(&mut self, expr: Expr) {
+        self.statements.push(Stmt::ExprStmt(expr));
+    }
 
     pub fn push_command(&mut self, command: Command) {
         self.statements.push(Stmt::Command(command));

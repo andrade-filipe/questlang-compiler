@@ -40,9 +40,14 @@ impl<'a> Parser<'a> {
             Token::If => self.parse_if(),
             Token::While => self.parse_while(),
             Token::For => self.parse_for(),
+            // Se não for nenhum desses, tenta parsear uma expressão como statement
             _ => {
-                self.error("Expected statement");
-                self.advance();
+                if let Some(expr) = self.parse_expr() {
+                    self.builder.push_expr(expr);
+                } else {
+                    self.error("Expected statement");
+                    self.advance();
+                }
             }
         }
     }
@@ -116,7 +121,7 @@ impl<'a> Parser<'a> {
     /// Altera o parse_block para extrair somente as statements adicionadas durante o bloco,
     /// preservando as statements do nível top-level.
     fn parse_block(&mut self) -> Vec<Stmt> {
-        // Registra o índice atual no builder.
+        // Registra o índice atual no builder
         let start_index = self.builder.statements.len();
         if self.consume(Token::LBrace, "Expected '{' to start block").is_none() {
             return Vec::new();
@@ -125,7 +130,7 @@ impl<'a> Parser<'a> {
             self.parse_stmt();
         }
         self.consume(Token::RBrace, "Expected '}' to close block");
-        // Extrai apenas as statements adicionadas neste bloco.
+        // Extrai somente as statements adicionadas neste bloco
         self.builder.statements.split_off(start_index)
     }
 
