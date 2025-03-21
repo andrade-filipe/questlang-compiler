@@ -5,6 +5,7 @@ use crate::{
     lexer::token::Token,
 };
 
+//TODO: Refatorar Parser para mais clareza de código
 pub struct Parser<'a> {
     tokens: Vec<(Token, &'a str, usize)>,
     source: &'a str,
