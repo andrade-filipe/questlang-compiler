@@ -20,14 +20,12 @@ for (hero; enemy; treasure) {
 }
 if (trap) {
     move_up
-    while (hero + 1) {
-        attack
-    }
+    while (hero + 1) { attack }
 } else {
     move_right
     if (hero - 2) {
-        attack
+        attack 
     } else {
-        jump
+        jump 
     }
 }
