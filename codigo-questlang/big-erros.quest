@@ -1,0 +1,347 @@
+// Caos Teste - Código com erros variados em QuestLang (aproximadamente 200 linhas)
+
+if ( hero {  
+    move_up
+    move_down
+    if ( enemy ) {
+        attack
+        jump
+    else
+        defend
+}
+else
+    move_left
+
+for ( 0; 10 1 ) {
+    move_right
+    // Laço while com erro: falta fechar parênteses
+    while ( treasure 
+    {
+        move_up
+        if treasure ) {
+            attack
+        } else {
+            jump
+        }
+    }
+}
+
+if ( trap ) {
+    move_down
+    for ( enemy enemy enemy + 1 ) {
+        defend
+    }
+}
+
+while ( enemy && trap ) 
+    move_left
+    move_right
+
+if ( hero - enemy * treasure / ) {
+    jump
+}
+
+if ( hero ) {
+    if ( enemy ) {
+        attack
+    else {
+        defend
+    }
+}
+
+move_up move_down
+move_left, move_right
+
+for ( 1 2 3 ) {
+    jump
+}
+
+if ( enemy && ! trap ) {
+    move_up
+    // Falta fechar a chave deste if
+     
+action_command
+if ( hero || treasure {
+    attack
+}
+
+while ( enemy ) {
+    move_down
+    if ( trap ) {
+        defend
+    // Falta fechar o bloco do if
+     
+random_command
+if ( jump ) {
+    move_up
+    move_down
+    if ( enemy - 1 ) {
+        attack
+    } else {
+        jump
+    }
+}
+
+if ( 5 +  ) {
+    move_left
+} else {
+    move_right
+}
+
+for ( 0; 5; ) {
+    move_up
+    move_down
+}
+
+if ( hero ) {
+    if ( enemy ) {
+        attack
+    }
+    else
+        jump
+    move_left
+    if ( treasure ) {
+        move_up
+        move_right
+    else {
+        defend
+    }
+}
+
+if ( hero && enemy || ) {
+    jump
+}
+if ( trap && ! ) {
+    attack
+}
+
+for ( 0; ; 1 ) {
+    move_down
+}
+
+if ( hero ) {
+    if ( enemy ) {
+        attack
+        move_up
+    } else {
+        move_left
+        if ( treasure {
+            jump
+        } else
+            defend
+    }
+    while ( trap ) {
+        move_right
+        if ( enemy ) {
+            attack
+        } else {
+            move_down
+        }
+    }
+    if ( hero + enemy - ) {
+        jump
+    }
+}
+
+for ( 0 10 1 ) {
+    move_up
+    move_down
+    move_left
+    move_right
+}
+
+if ( hero && enemy && trap ) {
+    move_up
+    move_down
+    if ( treasure ) {
+        attack
+    } else {
+        jump
+    }
+} else {
+    move_left
+} }
+
+while ( treasure ) {
+    move_right
+    move_left
+    if ( enemy ) {
+        attack
+    }
+    jump
+    defend
+}
+
+if hero ) {
+    move_up
+}
+else {
+    move_down
+}
+
+for ( 0; hero; enemy + ) {
+    move_left
+    move_right
+}
+
+if ( trap || enemy && treasure ) {
+    move_up
+    move_down
+    if ( hero ) {
+        attack
+    }
+} else {
+    jump
+}
+
+if ( enemy ) {
+    attack
+    jump
+move_left
+
+move_up move_down move_left move_right
+
+if ( hero ) {
+    if ( enemy ) {
+        attack
+        if ( treasure ) {
+            jump
+        } else {
+            defend
+        }
+    // Falta fechar o bloco interno do if
+    }
+    while ( trap ) {
+        move_up
+        move_down
+    }
+}
+
+if ( hero - enemy ) {
+    attack
+    jump
+} else {
+    defend
+    move_left
+    move_right
+}
+
+// Bloco de erros extra para atingir aproximadamente 200 linhas
+
+// Bloco A
+if ( hero {
+    move_up
+    if ( enemy ) {
+        attack
+    else {
+        defend
+    }
+}
+move_left
+
+// Bloco B
+for ( 0; 5 1 ) {
+    move_right
+    while ( treasure 
+    {
+        move_down
+        if ( trap ) {
+            defend
+        } else {
+            jump
+        }
+    }
+}
+
+// Bloco C
+if ( enemy && !hero ) {
+    attack
+} else {
+    jump
+    if ( treasure ) {
+        move_up
+    }
+}
+
+// Bloco D
+while ( enemy || trap {
+    move_left
+    move_right
+}
+
+// Bloco E
+for ( 1 2 3 ) {
+    jump
+    attack
+    defend
+}
+
+// Bloco F
+if ( hero && enemy -  ) {
+    move_up
+    move_down
+}
+
+// Bloco G
+if ( trap ) {
+    for ( enemy trap enemy + 1 ) {
+        defend
+        move_left
+    }
+}
+
+// Bloco H
+while ( treasure && !enemy ) 
+    move_up
+    move_right
+    if ( hero {
+        attack
+    } else {
+        jump
+    }
+
+// Bloco I
+if ( hero || enemy && ) {
+    move_down
+}
+else {
+    move_left
+    move_right
+}
+
+// Bloco J
+for ( 0; ;  ) {
+    move_up
+    move_down
+    move_left
+    move_right
+}
+
+// Bloco K - alguns comandos isolados com erros
+jump attack
+move_up move_down
+if ( enemy + ) {
+    defend
+}
+else {
+    move_left
+}
+
+// Bloco L
+while ( trap && hero ) {
+    move_right
+    if ( treasure ) {
+        attack
+    // Falta fechar o if
+    move_down
+}
+
+// Bloco M
+if ( hero && ( enemy ) {
+    jump
+}
+else {
+    defend
+    move_left
+    move_right
+}
